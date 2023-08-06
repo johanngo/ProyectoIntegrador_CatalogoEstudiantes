@@ -1,4 +1,7 @@
-﻿namespace ProyectoIntegrador_CatalogoEstudiantes
+﻿using System.ComponentModel.DataAnnotations;
+using static ProyectoIntegrador_CatalogoEstudiantes.Program;
+
+namespace ProyectoIntegrador_CatalogoEstudiantes
 {
     public class Program
     {
@@ -10,7 +13,7 @@
         /// <summary>
         /// Students control the current state of the application, it acts as in memory DB of all the students created.
         /// </summary>
-        public static List<Student> Students;
+        public static List<Student> Students = new List<Student>();
 
         /// <summary>
         /// Definition of struct Student, it contains all the displayable text and the fields for a Student.
@@ -53,11 +56,6 @@
                 Console.WriteLine("A continuacion seleccione una opcion del menu: \r\n");
 
                 DisplayMenu();
-
-
-                //Console.WriteLine("Programa finalizado!, presione cualquier tecla para salir");
-                //Console.ReadKey();
-                //Console.Clear();
 
                 var menuSelection = ReadCharFromConsole("---------------> ");
                 HandleMenuGUI(menuSelection);
@@ -205,13 +203,42 @@
         /// </summary>
         private static void DeleteStudent()
         {
-            ReadStringFromConsole("Proporcione el Id del estudiante para darlo de baja: ");
+            var enrollmentId = ReadStringFromConsole("Proporcione el la Matricula del estudiante para darlo de baja: ").ToString() ?? string.Empty;
 
-            Console.WriteLine("\r\n********** Estudiante dado de baja con Exito!!! *********\r\n");
+            var eraseCount = 0;
+
+            foreach (var item in Students)
+            {
+                if (item.EnrollmentId == enrollmentId)
+                {
+                    var console = ReadCharFromConsole($"\r\nEsta seguro que desea eliminar al estudiante con matricula {item.EnrollmentId}?. Presione 1 para confirmar 2 para cancelar: ").ToString();
+
+                    var result = Char.Parse(console);
+
+                    if (result != '1'  )
+                    {
+                        Console.WriteLine("\r\n********** Solicitud Cancelada *********\r\n");
+                        Console.WriteLine("Presione una tecla para continuar...");
+                        Console.ReadKey();
+                        return;
+                    }
+
+                    Students = Students.Where(x => x.EnrollmentId != enrollmentId).ToList();
+                    eraseCount ++;
+                    Console.WriteLine("\r\n********** Estudiante dado de baja con Exito!!! *********\r\n");
+
+                }
+            }
+
+            if (eraseCount == 0)
+            {
+                Console.WriteLine($"\r\n********** No se ha encontrado el estudiante con matricula {enrollmentId} *********\r\n");
+                Console.WriteLine("Presione una tecla para continuar...");
+                Console.ReadKey();
+            }
+
             Console.WriteLine("Presione una tecla para continuar...");
             Console.ReadKey();
-
-            // TODO: Implement method logic
         }
 
         /// <summary>
@@ -219,19 +246,22 @@
         /// </summary>
         private static void CreateStudent()
         {
-            ReadStringFromConsole(Student.DISPLAY_ENROLL_ID);
-            ReadStringFromConsole(Student.DISPLAY_NAME);
-            ReadStringFromConsole(Student.DISPLAY_F_LAST_NAME);
-            ReadStringFromConsole(Student.DISPLAY_M_LAST_NAME);
-            ReadStringFromConsole(Student.DISPLAY_CARREER);
-            ReadStringFromConsole(Student.DISPLAY_EMAIL);
-            ReadStringFromConsole(Student.DISPLAY_PHONE);
+            Student student = new Student();
+            student.EnrollmentId = ReadStringFromConsole(Student.DISPLAY_ENROLL_ID).ToString() ?? string.Empty;
+            student.FirstName = ReadStringFromConsole(Student.DISPLAY_NAME).ToString() ?? string.Empty;
+            student.FathersLastName = ReadStringFromConsole(Student.DISPLAY_F_LAST_NAME).ToString() ?? string.Empty;
+            student.MothersLastName = ReadStringFromConsole(Student.DISPLAY_M_LAST_NAME).ToString() ?? string.Empty;
+            student.Carreer = ReadStringFromConsole(Student.DISPLAY_CARREER).ToString() ?? string.Empty;
+            student.StudentEmail = ReadStringFromConsole(Student.DISPLAY_EMAIL).ToString() ?? string.Empty;
+            student.StudentPhone = ReadStringFromConsole(Student.DISPLAY_PHONE).ToString() ?? string.Empty;
+
+            Students.Add(student);
+
+
 
             Console.WriteLine("\r\n********** Estudiante guardado con Exito!!! *********\r\n");
             Console.WriteLine("Presione una tecla para continuar...");
             Console.ReadKey();
-
-            // TODO: Implement method logic
         }
 
         private static void ExitCatalog()
